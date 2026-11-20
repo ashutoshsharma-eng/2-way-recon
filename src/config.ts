@@ -1,6 +1,6 @@
 import { createElement } from "react";
 import type { ReactNode } from "react";
-import { HomeIcon, SwatchIcon } from "@heroicons/react/24/outline";
+import { HomeIcon } from "@heroicons/react/24/outline";
 import type { NavItem } from "@quantumphinance/kraft-component";
 import type { Tone } from "./ui";
 
@@ -14,10 +14,10 @@ export const APP = {
   logoDark: "/logo-dark.png",  // dark-mode logo (keep)
   product: "SheetKraft",       // footer, left: "<product> <version>"
   version: "1.0.0",
-  module: "Sample App",        // module name under the logo card  <- CHANGE
+  module: "2-Way Recon",       // module name under the logo card
   userName: "Demo User",       // header user pill: "<userName> · <role>"
-  searchPlaceholder: "Search records, then press Enter",
-  searchRoute: "/records",     // global search navigates to `${searchRoute}?q=...`
+  searchPlaceholder: "Search results by key or mismatch reason, then press Enter",
+  searchRoute: "/recon/results", // global search navigates to `${searchRoute}?q=...`
 };
 
 /**
@@ -25,29 +25,28 @@ export const APP = {
  * `stage` shows in the footer, right: "<module> Module · <stage>".
  */
 export const ROLES = {
-  maker: { key: "maker", label: "Maker", stage: "Initiator" },
-  checker: { key: "checker", label: "Checker", stage: "Reviewer" },
+  analyst: { key: "analyst", label: "Recon Analyst", stage: "Reconciliation" },
 } as const;
 export type RoleKey = keyof typeof ROLES;
-export const DEFAULT_ROLE: RoleKey = "maker";
+export const DEFAULT_ROLE: RoleKey = "analyst";
 
 /** Status -> chip colour. Use: <StatusChip status="Approved" tones={STATUS_TONE} />. */
 export const STATUS_TONE: Record<string, Tone> = {
-  Draft: "slate",
-  Pending: "amber",
-  "In Review": "purple",
-  "Sent Back": "orange",
-  Approved: "green",
-  Rejected: "red",
+  Matched: "green",
+  "Field Mismatch": "amber",
+  "Missing in B": "orange",
+  "Missing in A": "purple",
+  "Duplicate Key": "red",
+  Stale: "slate",
+  Current: "blue",
 };
 /** Same statuses as chart colours (text-* class, drawn with currentColor). */
 export const STATUS_COLOR: Record<string, string> = {
-  Draft: "text-slate-400 dark:text-slate-500",
-  Pending: "text-qp-amber",
-  "In Review": "text-qp-purple",
-  "Sent Back": "text-orange-500 dark:text-orange-400",
-  Approved: "text-qp-green",
-  Rejected: "text-qp-red",
+  Matched: "text-qp-green",
+  "Field Mismatch": "text-qp-amber",
+  "Missing in B": "text-orange-500 dark:text-orange-400",
+  "Missing in A": "text-qp-purple",
+  "Duplicate Key": "text-qp-red",
 };
 
 /** Green lettered square used as sub-menu icon (A / D / M / T ...), as in the SheetKraft sidebar. */
@@ -62,28 +61,26 @@ export const item = (id: string, l: string, label: string, badge?: number): NavI
 /** Group item: green -/+ box with tree line. */
 export const group = (id: string, label: string, children: NavItem[]): NavItem => ({ id, label, children });
 
-/** Sidebar. Home is always first. Max ~6 top-level entries. `counts` feeds badges (e.g. pending tray). */
-export function buildNav(role: RoleKey, counts: Record<string, number> = {}): NavItem[] {
+/** Sidebar. Home is always first. `counts.exceptions` puts the open-exception count on the Results item. */
+export function buildNav(_role: RoleKey, counts: Record<string, number> = {}): NavItem[] {
   const home: NavItem = { id: "dashboard", label: "Home", icon: createElement(HomeIcon, { className: "w-4 h-4" }) };
-  const records = group("rec", "Records", [
-    item("records", "R", "All Records", counts.records),
-    ...(role === "maker" ? [item("records/new", "N", "New Record")] : []),
+  const recon = group("rec", "Reconciliation", [
+    item("recon/upload", "U", "1 · Upload Datasets"),
+    item("recon/map", "M", "2 · Map & Transform"),
+    item("recon/results", "R", "3 · Results & Export", counts.exceptions),
   ]);
-  const reports = group("rep", "Reports", [item("reports/summary", "S", "Summary Report")]);
-  const admin = group("adm", "Admin", [
-    item("import", "U", "Data Import"),
-    item("reset", "X", "Reset Demo Data"),
+  const cfg = group("adm", "Configuration", [
+    item("templates", "T", "Mapping Templates"),
+    item("reset", "X", "Reset Session"),
   ]);
-  const guide: NavItem = { id: "design-system", label: "Design System", icon: createElement(SwatchIcon, { className: "w-4 h-4" }) };
-  return [home, records, reports, admin, guide]; // remove `guide` before handing the app to end users
+  return [home, recon, cfg];
 }
 
 /** Which sidebar item is highlighted for a route (detail pages light up their parent). */
 export function activeNavFor(path: string): string {
   const p = path.replace(/^\//, "");
-  if (p.startsWith("records/") && p !== "records/new") return "records";
   return p || "dashboard";
 }
 
 /** Sidebar groups that start expanded. */
-export const OPEN_GROUPS = ["rec"];
+export const OPEN_GROUPS = ["rec", "adm"];

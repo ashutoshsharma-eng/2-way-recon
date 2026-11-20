@@ -5,7 +5,7 @@ import { ToastProvider } from "@quantumphinance/kraft-component";
 import "@quantumphinance/kraft-component/styles.css";
 import "./index.css";
 import App from "./App";
-import { RecordsProvider } from "./features/records";
+import { ReconProvider } from "./features/recon";
 import { AppProvider } from "./lib/app";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
@@ -13,9 +13,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     <HashRouter>
       <ToastProvider>
         <AppProvider>
-          <RecordsProvider>
+          <ReconProvider>
             <App />
-          </RecordsProvider>
+          </ReconProvider>
         </AppProvider>
       </ToastProvider>
     </HashRouter>
