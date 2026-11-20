@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== QP / SheetKraft theme =====
+   Values are "R G B" channels so Tailwind opacity modifiers work (bg-qp-blue/10).
+   Light values match the reference Related Party app; dark values are the same palette on navy. */
+:root {
+  --qp-page: 255 255 255;
+  --qp-side: 230 240 249;     /* #e6f0f9 */
+  --qp-surface: 255 255 255;
+  --qp-card: 243 247 252;     /* #f3f7fc */
+  --qp-hover: 234 242 250;    /* #eaf2fa */
+  --qp-navon: 211 228 245;    /* #d3e4f5 */
+  --qp-search: 243 244 246;   /* #f3f4f6 */
+  --qp-ink: 31 41 55;         /* #1f2937 */
+  --qp-mut: 91 102 114;       /* #5b6672 */
+  --qp-line: 201 214 228;     /* #c9d6e4 */
+  --qp-field: 159 182 207;    /* #9fb6cf */
+  --qp-blue: 46 117 182;      /* #2e75b6 */
+  --qp-bluetext: 31 90 148;   /* #1f5a94 */
+  --qp-green: 47 158 124;     /* #2f9e7c */
+  --qp-amber: 217 154 29;     /* #d99a1d */
+  --qp-red: 192 57 43;        /* #c0392b */
+  --qp-purple: 122 92 194;    /* #7a5cc2 */
+}
+.dark {
+  --qp-page: 11 17 27;
+  --qp-side: 15 29 48;
+  --qp-surface: 19 30 46;
+  --qp-card: 20 31 47;
+  --qp-hover: 27 42 63;
+  --qp-navon: 28 51 80;
+  --qp-search: 24 37 56;
+  --qp-ink: 229 231 235;
+  --qp-mut: 154 166 181;
+  --qp-line: 38 52 69;
+  --qp-field: 59 79 102;
+  --qp-blue: 91 155 213;
+  --qp-bluetext: 140 187 230;
+  --qp-green: 76 195 157;
+  --qp-amber: 240 184 74;
+  --qp-red: 239 112 98;
+  --qp-purple: 167 139 250;
+}
+
+html, body, #root { height: 100%; }
+body {
+  @apply bg-qp-page text-qp-ink antialiased;
+  font-size: 14px;
+}
+a { color: rgb(var(--qp-blue)); }
+
+/* Light-mode remaps used by the reference app, so kraft-component's own classes match the QP look:
+   input borders are blue-grey and field labels are the QP muted grey.
+   :where() keeps specificity low, so hover:/dark: variants still win. */
+:where(html:not(.dark)) .border-gray-200 { border-color: rgb(var(--qp-field)); }
+:where(html:not(.dark)) .text-gray-400 { color: rgb(var(--qp-mut)); }
+:where(html:not(.dark)) .text-red-500 { color: #b3261e; }
+
+/* Visible keyboard focus in brand blue */
+:where(:focus-visible) { outline: 2px solid rgb(var(--qp-blue)); outline-offset: 2px; }
+
+/* kraft-component 1.1.0 bug: TextareaField gets both h-9 and h-24 and h-9 wins in the CSS order,
+   so textareas collapse to one line. Restore the intended 6rem height. */
+textarea.h-24 { height: 6rem; }
